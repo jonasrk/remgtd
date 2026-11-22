@@ -66,11 +66,19 @@ def cmd_serve(args: argparse.Namespace) -> int:
 
     from .server import create_app
 
-    cfg = config.load(Path(args.config) if args.config else None)
-    rc = Remctl(find_remctl(cfg.remctl))
+    if args.demo:
+        from .demo import DemoRemctl
+
+        cfg = config.Config()
+        app = create_app(cfg, DemoRemctl(), opener=lambda url: None)  # type: ignore[arg-type]
+        label = "demo View (synthetic data)"
+    else:
+        cfg = config.load(Path(args.config) if args.config else None)
+        app = create_app(cfg, Remctl(find_remctl(cfg.remctl)))
+        label = "View"
     port = args.port or cfg.view.port
-    print(f"remgtd: View at http://127.0.0.1:{port}  (Ctrl-C or close this tab to stop)")
-    uvicorn.run(create_app(cfg, rc), host="127.0.0.1", port=port, log_level="warning")
+    print(f"remgtd: {label} at http://127.0.0.1:{port}  (Ctrl-C or close this tab to stop)")
+    uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
     return 0
 
 
@@ -159,6 +167,7 @@ def main(argv: list[str] | None = None) -> int:
 
     p_serve = sub.add_parser("serve", help="run the local server behind the View")
     p_serve.add_argument("--port", type=int, help="port (default from config: 8765)")
+    p_serve.add_argument("--demo", action="store_true", help="serve a synthetic GTD system instead of Reminders")
     p_serve.set_defaults(func=cmd_serve)
 
     p_open = sub.add_parser("open", help="start the server if needed; Reminders left, the View right")

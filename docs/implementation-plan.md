@@ -1,6 +1,6 @@
 # Implementation plan
 
-Status: **draft for review**.
+Status: **implemented** (v0.1.0, 2026-11-22). Additions beyond the plan: the System overview tab and `remgtd serve --demo`.
 
 ## Shape
 
