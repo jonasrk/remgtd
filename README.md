@@ -93,7 +93,7 @@ If your lists have different names, see the configuration section below. Names a
 
 **The View:**
 - **System** shows everything at a glance.
-- **Open Loops**, **Contexts**, **Waiting For** and **Reflect** show the details.
+- **Open Loops**, **Next Actions** (each action once), **Contexts**, **Waiting For** and **Reflect** show the details.
 - The **Work / Personal** switch filters everything.
 - The Violation/Hint counter at the top shows only items with problems.
 - Clicking an item opens it in Reminders.

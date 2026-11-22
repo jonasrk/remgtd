@@ -82,6 +82,21 @@ function loopsTab() {
     ${list(singles.map((it) => row(it)))}`;
 }
 
+// Lead Actions first, then the rest of each Open Loop's actions, then single Next Actions.
+const byLeadFirst = (rows) => [...rows].sort((a, b) => b.isLead - a.isLead);
+
+function nextTab() {
+  const acts = actions().filter(visible);
+  const doable = byLeadFirst(acts.filter((a) => a.contexts.length));
+  const none = acts.filter((a) => !a.contexts.length);
+  let html = `<h2>Next Actions · ${doable.length}</h2>${list(
+    doable.map((r) => row(r, { loopName: true })),
+    `No Next Actions${ui.sphere !== "all" ? " in this Sphere" : ""}.`
+  )}`;
+  if (none.length) html += `<h2>Without a Context · ${none.length}</h2>${list(none.map((r) => row(r, { loopName: true })))}`;
+  return html;
+}
+
 function contextsTab() {
   const acts = actions().filter(visible);
   let html = "";
@@ -168,18 +183,19 @@ function systemTab() {
     ok(!loopsBad, loopsBad ? `${loopsBad} need attention` : "all have a Lead Action"));
 
   const acts = actions().filter(inSphere);
-  let ctxBody = "";
-  for (const kind of d.contextKinds) {
-    const counts = d.contexts
-      .filter((c) => c.kind === kind)
-      .map((c) => [c.tag, acts.filter((a) => a.contexts.some((t) => t.toLowerCase() === c.tag.toLowerCase())).length])
-      .filter(([, n]) => n);
-    if (counts.length) ctxBody += `<div class="kind"><span class="kind-name">${esc(kind)}</span>${counts.map(([t, n]) => `<span class="chip">#${esc(t)} ${n}</span>`).join(" ")}</div>`;
-  }
-  const noCtx = acts.filter((a) => !a.contexts.length).length;
-  const nextTile = tile("Next Actions", "contexts", acts.filter((a) => a.contexts.length).length,
-    (ctxBody || `<p class="empty">None</p>`) + `<p class="meta">${items(d.lists.nextActions).filter(inSphere).length} single, the rest inside Open Loops</p>`,
-    ok(!noCtx, noCtx ? `${noCtx} without a Context` : "all have a Context"));
+  const doable = byLeadFirst(acts.filter((a) => a.contexts.length));
+  const noCtx = acts.filter((a) => !a.contexts.length);
+  const ctxCounts = d.contextKinds
+    .flatMap((kind) => d.contexts.filter((c) => c.kind === kind))
+    .map((c) => [c.tag, doable.filter((a) => a.contexts.some((t) => t.toLowerCase() === c.tag.toLowerCase())).length])
+    .filter(([, n]) => n);
+  const actionRows = [...doable, ...noCtx].map(
+    (it) => `<li data-id="${it.id}">${it.isLead ? "⚑ " : ""}${esc(it.title)} ${chips(it.contexts)} ${badges(it)}</li>`
+  );
+  const nextTile = tile("Next Actions", "next", doable.length,
+    (actionRows.length ? `<ul class="compact actions">${actionRows.join("")}</ul>` : `<p class="empty">None</p>`) +
+      (ctxCounts.length ? `<div class="kind by-context">${ctxCounts.map(([t, n]) => `<span class="chip">#${esc(t)} ${n}</span>`).join(" ")}</div>` : ""),
+    ok(!noCtx.length, noCtx.length ? `${noCtx.length} without a Context` : "all have a Context"));
 
   const waiting = items(d.lists.waitingFor).filter(inSphere);
   const waitingTile = tile("Waiting For", "waiting", waiting.length, compact(waiting),
@@ -255,7 +271,7 @@ function renderGuide() {
     .join("");
 }
 
-const TABS = { system: systemTab, loops: loopsTab, contexts: contextsTab, waiting: waitingTab, reflect: reflectTab };
+const TABS = { system: systemTab, loops: loopsTab, next: nextTab, contexts: contextsTab, waiting: waitingTab, reflect: reflectTab };
 
 // --- chrome -----------------------------------------------------------------------
 
