@@ -149,7 +149,7 @@ function tile(title, tab, count, body, health = "") {
 
 function compact(rows) {
   if (!rows.length) return `<p class="empty">Empty</p>`;
-  const shown = rows.map((it) => `<li data-id="${it.id}">${it.isLead || it.flagged ? "⚑ " : ""}${esc(it.title)} ${badges(it)}</li>`);
+  const shown = rows.map((it) => `<li data-id="${it.id}"${it.isLead || it.flagged ? ' class="flagged"' : ""}>${esc(it.title)} ${badges(it)}</li>`);
   return `<ul class="compact">${shown.join("")}</ul>`;
 }
 
@@ -186,7 +186,7 @@ function systemTab() {
     .map((c) => [c.tag, doable.filter((a) => a.contexts.some((t) => t.toLowerCase() === c.tag.toLowerCase())).length])
     .filter(([, n]) => n);
   const actionRows = [...doable, ...noCtx].map(
-    (it) => `<li data-id="${it.id}">${it.isLead ? "⚑ " : ""}${esc(it.title)} ${chips(it.contexts)} ${badges(it)}</li>`
+    (it) => `<li data-id="${it.id}"${it.isLead ? ' class="flagged"' : ""}>${esc(it.title)} ${chips(it.contexts)} ${badges(it)}</li>`
   );
   const nextTile = tile("Next Actions", "next", doable.length,
     (actionRows.length ? `<ul class="compact actions">${actionRows.join("")}</ul>` : `<p class="empty">None</p>`) +

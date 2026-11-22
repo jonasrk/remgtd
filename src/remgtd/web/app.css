@@ -157,3 +157,8 @@ ul.compact.actions li .chip { font-size: 11px; }
 .tile-sub { margin: 8px 0 2px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
 .toggle { margin-left: auto; border: 1px solid var(--line); background: transparent; border-radius: 6px; padding: 1px 8px; font-size: 12px; color: var(--muted); }
 .toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Bullets with a hanging indent, so wrapped titles stay visibly one item. */
+ul.compact:not(.loops) li { position: relative; padding-left: 14px; }
+ul.compact:not(.loops) li::before { content: "•"; position: absolute; left: 2px; color: var(--muted); }
+ul.compact:not(.loops) li.flagged::before { content: "⚑"; left: 0; color: var(--hint); font-size: 11px; top: 3px; }

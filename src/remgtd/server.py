@@ -31,6 +31,15 @@ from .remctl import Remctl, RemctlError
 META = "__meta__"  # rotation step that refreshes lists and smart lists
 
 
+class RevalidatingStaticFiles(StaticFiles):
+    """Static files the browser must revalidate (ETag → 304), so updates show up on reload."""
+
+    def file_response(self, *args, **kwargs):  # type: ignore[override]
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 class Poller:
     def __init__(
         self,
@@ -203,7 +212,7 @@ def create_app(
             Route("/guide.json", guide_json),
             Route("/events", events),
             Route("/open/{id:int}", open_item, methods=["POST"]),
-            Mount("/static", StaticFiles(directory=_web("")), name="static"),
+            Mount("/static", RevalidatingStaticFiles(directory=_web("")), name="static"),
         ],
         middleware=[Middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])],
         lifespan=lifespan,

@@ -115,7 +115,9 @@ def test_open_unknown_item(setup):
 def test_index_and_static_are_served(setup):
     client, *_ = setup
     assert "remgtd" in client.get("/").text
-    assert client.get("/static/app.js").status_code == 200
+    js = client.get("/static/app.js")
+    assert js.status_code == 200
+    assert js.headers["cache-control"] == "no-cache"
 
 
 def test_error_state_keeps_last_data(world):
