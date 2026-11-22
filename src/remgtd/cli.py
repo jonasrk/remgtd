@@ -61,6 +61,19 @@ def cmd_check(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_serve(args: argparse.Namespace) -> int:
+    import uvicorn
+
+    from .server import create_app
+
+    cfg = config.load(Path(args.config) if args.config else None)
+    rc = Remctl(find_remctl(cfg.remctl))
+    port = args.port or cfg.view.port
+    print(f"remgtd: View at http://127.0.0.1:{port}  (Ctrl-C or close this tab to stop)")
+    uvicorn.run(create_app(cfg, rc), host="127.0.0.1", port=port, log_level="warning")
+    return 0
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     path = Path(args.config) if args.config else config.default_path()
     if path.exists() and not args.force:
@@ -81,6 +94,10 @@ def main(argv: list[str] | None = None) -> int:
     p_check = sub.add_parser("check", help="read Reminders once and print Violations and Hints")
     p_check.add_argument("--json", action="store_true", help="machine-readable output")
     p_check.set_defaults(func=cmd_check)
+
+    p_serve = sub.add_parser("serve", help="run the local server behind the View")
+    p_serve.add_argument("--port", type=int, help="port (default from config: 8765)")
+    p_serve.set_defaults(func=cmd_serve)
 
     p_init = sub.add_parser("init", help="write a commented default config")
     p_init.add_argument("--force", action="store_true", help="overwrite an existing config")

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>remgtd</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="top">
+    <span class="brand">remgtd</span>
+    <div class="sphere" role="group" aria-label="Sphere">
+      <button data-sphere="all">All</button>
+      <button data-sphere="work">Work</button>
+      <button data-sphere="personal">Personal</button>
+    </div>
+    <button id="problems" class="counts" title="Show only items with Violations or Hints"></button>
+    <span id="status" class="status" title="Connection"></span>
+  </header>
+  <div id="banner" class="banner" hidden></div>
+  <section id="guide" class="guide" aria-label="Step Guide"></section>
+  <nav class="tabs" aria-label="Views">
+    <button data-tab="loops">Open Loops</button>
+    <button data-tab="contexts">Contexts</button>
+    <button data-tab="waiting">Waiting For</button>
+    <button data-tab="reflect">Reflect</button>
+  </nav>
+  <main id="main"><p class="empty">Loading…</p></main>
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>

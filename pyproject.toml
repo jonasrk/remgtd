@@ -5,7 +5,10 @@ description = "Getting Things Done, by the book, on top of Apple Reminders: conv
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "starlette>=1.10.0",
+    "uvicorn>=0.54.0",
+]
 
 [project.scripts]
 remgtd = "remgtd.cli:main"
@@ -19,5 +22,6 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.16.2",
     "pytest>=9.2.0",
 ]
