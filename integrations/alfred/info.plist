@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>io.github.remgtd</string>
+	<key>category</key>
+	<string>Productivity</string>
+	<key>connections</key>
+	<dict>
+		<key>6F1C1D2E-6E2B-4C1A-9B1E-52E0D1A7C001</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>6F1C1D2E-6E2B-4C1A-9B1E-52E0D1A7C002</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>remgtd</string>
+	<key>description</key>
+	<string>Open Reminders and the remgtd View side by side</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>remgtd</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>gtd</string>
+				<key>subtext</key>
+				<string>Reminders on the left, the remgtd View on the right</string>
+				<key>text</key>
+				<string>Open remgtd</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>6F1C1D2E-6E2B-4C1A-9B1E-52E0D1A7C001</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>0</integer>
+				<key>script</key>
+				<string># uv installs tools into ~/.local/bin; Alfred doesn't load your shell profile.
+export PATH="$HOME/.local/bin:$HOME/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+remgtd open
+</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>6F1C1D2E-6E2B-4C1A-9B1E-52E0D1A7C002</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>Type `gtd` in Alfred. Requires remgtd on PATH (`uv tool install git+https://github.com/jonasrk/remgtd`).</string>
+	<key>uidata</key>
+	<dict>
+		<key>6F1C1D2E-6E2B-4C1A-9B1E-52E0D1A7C001</key>
+		<dict>
+			<key>xpos</key>
+			<integer>50</integer>
+			<key>ypos</key>
+			<integer>50</integer>
+		</dict>
+		<key>6F1C1D2E-6E2B-4C1A-9B1E-52E0D1A7C002</key>
+		<dict>
+			<key>xpos</key>
+			<integer>250</integer>
+			<key>ypos</key>
+			<integer>50</integer>
+		</dict>
+	</dict>
+	<key>version</key>
+	<string>0.1.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/jonasrk/remgtd</string>
+</dict>
+</plist>

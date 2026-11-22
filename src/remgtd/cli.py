@@ -74,6 +74,68 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_open(args: argparse.Namespace) -> int:
+    from .launcher import LauncherError, open_all
+
+    cfg = config.load(Path(args.config) if args.config else None)
+    try:
+        open_all(cfg, config_path=args.config, place=not args.no_place)
+    except LauncherError as exc:
+        print(f"remgtd: {exc}", file=sys.stderr)
+        return 2
+    return 0
+
+
+def cmd_doctor(args: argparse.Namespace) -> int:
+    from .launcher import server_running
+
+    problems = 0
+
+    def report(good: bool, text: str, fix: str = "") -> None:
+        nonlocal problems
+        problems += not good
+        print(f"  {'✓' if good else '✗'} {text}")
+        if fix and not good:
+            print(f"      → {fix}")
+
+    path = Path(args.config) if args.config else config.default_path()
+    print("remgtd doctor")
+    try:
+        cfg = config.load(path)
+        report(True, f"config: {path}" if path.exists() else f"config: defaults (no file at {path})")
+    except ConfigError as exc:
+        report(False, f"config: {exc}")
+        return 1
+    try:
+        rc = Remctl(find_remctl(cfg.remctl))
+        report(True, f"remctl: {rc.path}")
+        snap = snapshot.read(rc, cfg)
+        report(True, f"Reminders readable: {len(snap.reminders)} reminders")
+    except RemctlError as exc:
+        report(False, f"remctl: {exc}", "Install RemCTL and run `remctl doctor`.")
+        return 1
+    m = model.build(snap, cfg)
+    report(m.group_found, f"list group \"{cfg.group}\"", "Create it in Reminders or set `group` in the config.")
+    if m.group_found:
+        report(not m.missing_lists, "GTD lists present" + (f" (missing: {', '.join(m.missing_lists)})" if m.missing_lists else ""),
+               "Create the missing lists inside the group, or rename them in the config [lists].")
+        if m.unknown_group_lists:
+            print(f"    note: ignored lists in the group: {', '.join(m.unknown_group_lists)}")
+    kinds: dict[str, int] = {}
+    for ctx in m.contexts.values():
+        kinds[ctx.kind] = kinds.get(ctx.kind, 0) + 1
+    report(bool(kinds), "Contexts: " + (", ".join(f"{k} {n}" for k, n in kinds.items()) or "none found"),
+           "Add one smart list per Context tag inside the groups listed in config [contexts] groups.")
+    agenda = cfg.contexts.agenda_group.casefold()
+    report(any(k.casefold() == agenda for k in kinds), f"Agenda group \"{cfg.contexts.agenda_group}\" has Contexts",
+           "Waiting For items need an Agenda Context (one smart list per person).")
+    running = server_running(cfg.view.port)
+    print(f"  {'●' if running else '○'} server {'running' if running else 'not running'} on port {cfg.view.port}")
+    print("  i window placement needs Accessibility permission for the app that runs `remgtd open`")
+    print("\nAll good." if not problems else f"\n{problems} problem{'s' * (problems != 1)}.")
+    return 0 if not problems else 1
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     path = Path(args.config) if args.config else config.default_path()
     if path.exists() and not args.force:
@@ -98,6 +160,13 @@ def main(argv: list[str] | None = None) -> int:
     p_serve = sub.add_parser("serve", help="run the local server behind the View")
     p_serve.add_argument("--port", type=int, help="port (default from config: 8765)")
     p_serve.set_defaults(func=cmd_serve)
+
+    p_open = sub.add_parser("open", help="start the server if needed; Reminders left, the View right")
+    p_open.add_argument("--no-place", action="store_true", help="don't move or resize windows")
+    p_open.set_defaults(func=cmd_open)
+
+    p_doctor = sub.add_parser("doctor", help="check RemCTL, the lists, Contexts and the server")
+    p_doctor.set_defaults(func=cmd_doctor)
 
     p_init = sub.add_parser("init", help="write a commented default config")
     p_init.add_argument("--force", action="store_true", help="overwrite an existing config")
