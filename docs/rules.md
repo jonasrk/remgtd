@@ -4,6 +4,7 @@ Status: **accepted** 2026-11-22.
 
 V = Violation (a Rule is broken), H = Hint (probably drifting, may be fine). Day thresholds are starting values.
 Scope: only lists in the remgtd group (In-box, Open Loops, Next Actions, Waiting For, Someday/Maybe, Autopilot).
+Rules check open items only; completed items are history.
 
 ## In-box
 
