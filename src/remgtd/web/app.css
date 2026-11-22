@@ -57,6 +57,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .counts.on { outline: 2px solid var(--accent); }
 .counts .v { color: var(--violation); font-weight: 600; }
 .counts .h { color: var(--hint); font-weight: 600; }
+.counts .zero { color: var(--muted); }
 .status { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
 .status.live { background: #34c759; }
 .status.stale { background: var(--hint); }
@@ -72,7 +73,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .tabs button.on { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
 .tabs .n { color: var(--muted); font-weight: 400; margin-left: 4px; }
 
-main { padding: 14px 18px 40px; max-width: 1100px; }
+main { padding: 14px 18px 40px; max-width: 1500px; }
 h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 22px 0 8px; font-weight: 600; }
 h2:first-child { margin-top: 4px; }
 h3 { font-size: 14px; margin: 14px 0 6px; }
@@ -106,3 +107,49 @@ li.nocontext .title { color: var(--muted); }
 
 .findings { list-style: none; margin: 0; padding: 0; }
 .findings li { padding: 4px 0; }
+
+/* --- Step Guide --------------------------------------------------------------- */
+.step { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); align-self: start; }
+.step > header { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; cursor: pointer; }
+.step > header:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.step-name { font-weight: 600; }
+.step-status { font-size: 12px; }
+.step-status.good { color: var(--muted); }
+.step-status.attention { color: var(--hint); font-weight: 600; }
+.step-status a { color: var(--accent); }
+.step-body { padding: 0 10px 10px; font-size: 13px; border-top: 1px solid var(--line); }
+.step-body h4 { margin: 10px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.step-body h4 em { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.step-body ul { margin: 0; padding-left: 16px; }
+.step-body li.d1 { margin-left: 14px; list-style: circle; }
+.step-body li.d2 { margin-left: 28px; list-style: square; }
+.from-to span { display: inline-block; min-width: 34px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
+code { font-family: ui-monospace, Menlo, monospace; font-size: 0.92em; }
+
+/* --- System overview ---------------------------------------------------------- */
+.verdict { padding: 10px 14px; border-radius: var(--radius); font-weight: 600; margin-bottom: 12px; }
+.verdict.good { background: color-mix(in srgb, #34c759 14%, var(--panel)); }
+.verdict.attention { background: var(--violation-bg); color: var(--violation); }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .guide { grid-template-columns: 1fr; } }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; min-width: 0; }
+.tile > header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.tile > header[data-goto] { cursor: pointer; }
+.tile > header[data-goto]:hover .tile-title { color: var(--accent); }
+.tile-title { font-weight: 650; }
+.tile-count { color: var(--muted); }
+.health { margin-left: auto; font-size: 12px; white-space: nowrap; }
+.health.good { color: #2e9b4f; }
+.health.attention { color: var(--hint); font-weight: 600; }
+ul.compact { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+ul.compact li { padding: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+ul.compact li:hover { color: var(--accent); }
+ul.compact li.more { color: var(--muted); cursor: default; }
+ul.compact.loops li { white-space: normal; padding: 4px 0; }
+ul.compact.loops li + li { border-top: 1px solid var(--line); }
+.loop { font-weight: 600; }
+.lead-line { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.lead-line.missing { color: var(--violation); }
+.kind { display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; margin: 4px 0; }
+.kind-name { font-size: 12px; color: var(--muted); min-width: 74px; }
+.tile .meta { margin: 8px 0 0; }

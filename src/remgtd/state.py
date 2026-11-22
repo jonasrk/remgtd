@@ -34,6 +34,38 @@ def _item(m: Model, item: Item, now: datetime, finding_idx: dict[int, list[int]]
     }
 
 
+def _checklist(m: Model, name: str) -> dict[str, Any] | None:
+    """Progress of the newest copy of a Checklist (lists made from a template share a name)."""
+    rows = [i for i in m.items.values() if i.list.casefold() == name.casefold() and i.is_top_level]
+    dated = [i.created for i in rows if i.created]
+    if not rows or not dated:
+        return None
+    day = max(dated).date()
+    batch = [i for i in rows if i.created and i.created.date() == day]
+    return {"name": name, "done": sum(i.completed for i in batch), "total": len(batch)}
+
+
+def _steps(m: Model, findings: list[rules.Finding], now: datetime) -> dict[str, Any]:
+    inbox = m.top_level("inbox")
+    ages = [d for d in (_days(now, i.created) for i in inbox) if d is not None]
+    violations = [f for f in findings if f.severity == rules.VIOLATION]
+    by_rule: dict[str, int] = {}
+    for f in violations:
+        by_rule[f.rule] = by_rule.get(f.rule, 0) + 1
+    top = max(by_rule, key=lambda r: (by_rule[r], -int(r[1:])), default=None)
+    leads = [lead for loop in m.open_loops() for lead in m.lead_actions(loop)]
+    return {
+        "inbox": len(inbox),
+        "oldestInboxDays": max(ages, default=None),
+        "checklist": _checklist(m, m.cfg.view.inbox_sweep_checklist),
+        "violations": len(violations),
+        "topViolation": {"rule": top, "title": rules.RULES[top].title, "count": by_rule[top]} if top else None,
+        "stalled": sum(f.rule == "R6" for f in findings),
+        "oldWaiting": sum(f.rule == "R12" for f in findings),
+        "leadActions": [{"id": lead.id, "work": m.is_work(lead)} for lead in leads],
+    }
+
+
 def build(m: Model, findings: list[rules.Finding], now: datetime | None = None) -> dict[str, Any]:
     now = now or datetime.now()
     finding_idx: dict[int, list[int]] = {}
@@ -76,6 +108,7 @@ def build(m: Model, findings: list[rules.Finding], now: datetime | None = None) 
         "groupFound": m.group_found,
         "missingLists": m.missing_lists,
         "counts": {"violations": v, "hints": len(findings) - v},
+        "steps": _steps(m, findings, now),
         "items": items,
         "lists": {
             "inbox": ids("inbox"),

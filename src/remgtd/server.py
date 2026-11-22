@@ -24,7 +24,7 @@ from starlette.responses import FileResponse, JSONResponse, Response, StreamingR
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-from . import model, rules, snapshot, state
+from . import guide, model, rules, snapshot, state
 from .config import Config
 from .remctl import Remctl, RemctlError
 
@@ -160,6 +160,9 @@ def create_app(
     async def health(request: Request) -> Response:
         return JSONResponse({"ok": True, "app": "remgtd", "version": poller.version})
 
+    async def guide_json(request: Request) -> Response:
+        return JSONResponse(guide.cards())
+
     async def state_json(request: Request) -> Response:
         if poller.state is None:
             return JSONResponse({"ok": False, "error": "Loading…"}, status_code=503)
@@ -197,6 +200,7 @@ def create_app(
             Route("/", index),
             Route("/health", health),
             Route("/state.json", state_json),
+            Route("/guide.json", guide_json),
             Route("/events", events),
             Route("/open/{id:int}", open_item, methods=["POST"]),
             Mount("/static", StaticFiles(directory=_web("")), name="static"),
