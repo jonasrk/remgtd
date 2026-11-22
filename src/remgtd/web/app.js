@@ -75,11 +75,8 @@ function loopsTab() {
       <ul>${kids.map((k) => row(k)).join("")}</ul>
     </div>`;
   });
-  const singles = items(ui.data.lists.nextActions).filter(visible);
   return `<h2>Open Loops · ${loops.length}</h2>
-    ${cards.join("") || `<p class="empty">No Open Loops${ui.sphere !== "all" ? " in this Sphere" : ""}.</p>`}
-    <h2>Single Next Actions · ${singles.length}</h2>
-    ${list(singles.map((it) => row(it)))}`;
+    ${cards.join("") || `<p class="empty">No Open Loops${ui.sphere !== "all" ? " in this Sphere" : ""}.</p>`}`;
 }
 
 // Lead Actions first, then the rest of each Open Loop's actions, then single Next Actions.
