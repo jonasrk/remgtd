@@ -147,11 +147,10 @@ function tile(title, tab, count, body, health = "") {
   </section>`;
 }
 
-function compact(rows, max = 8) {
+function compact(rows) {
   if (!rows.length) return `<p class="empty">Empty</p>`;
-  const shown = rows.slice(0, max).map((it) => `<li data-id="${it.id}">${it.isLead || it.flagged ? "⚑ " : ""}${esc(it.title)} ${badges(it)}</li>`);
-  const more = rows.length > max ? `<li class="more">+${rows.length - max} more</li>` : "";
-  return `<ul class="compact">${shown.join("")}${more}</ul>`;
+  const shown = rows.map((it) => `<li data-id="${it.id}">${it.isLead || it.flagged ? "⚑ " : ""}${esc(it.title)} ${badges(it)}</li>`);
+  return `<ul class="compact">${shown.join("")}</ul>`;
 }
 
 const ok = (good, text) => `<span class="health ${good ? "good" : "attention"}">${good ? "✓" : "!"} ${esc(text)}</span>`;
@@ -199,10 +198,15 @@ function systemTab() {
     ok(!d.steps.oldWaiting, d.steps.oldWaiting ? `${d.steps.oldWaiting} to follow up` : "current"));
 
   const someday = items(d.lists.someday).filter(inSphere);
-  const bySection = {};
-  for (const s of someday) bySection[s.section || "Unsorted"] = (bySection[s.section || "Unsorted"] || 0) + 1;
-  const somedayTile = tile("Someday/Maybe", "reflect", someday.length,
-    `<div class="kind">${Object.entries(bySection).map(([s, n]) => `<span class="chip">${esc(s)} ${n}</span>`).join(" ")}</div>`);
+  const sectionNames = [...new Set(someday.map((s) => s.section || ""))].sort((a, b) => (a === "") - (b === "") || a.localeCompare(b));
+  const somedayBody = sectionNames
+    .map((name) => {
+      const rows = someday.filter((r) => (r.section || "") === name);
+      const heading = sectionNames.length > 1 ? `<h5 class="tile-sub">${esc(name || "Unsorted")} · ${rows.length}</h5>` : "";
+      return heading + compact(rows);
+    })
+    .join("");
+  const somedayTile = tile("Someday/Maybe", "reflect", someday.length, somedayBody || `<p class="empty">Empty</p>`);
 
   const autopilot = items(d.lists.autopilot).filter(inSphere);
   const autoTile = tile("Autopilot", "reflect", autopilot.length, compact(autopilot));
