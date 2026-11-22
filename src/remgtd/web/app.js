@@ -206,7 +206,15 @@ function systemTab() {
       return heading + compact(rows);
     })
     .join("");
-  const somedayTile = tile("Someday/Maybe", "reflect", someday.length, somedayBody || `<p class="empty">Empty</p>`);
+  const somedayOpen = localStorage.getItem("remgtd.someday.open") === "1";
+  const somedaySummary = `<div class="kind">${sectionNames
+    .map((name) => `<span class="chip">${esc(name || "Unsorted")} ${someday.filter((r) => (r.section || "") === name).length}</span>`)
+    .join(" ")}</div>`;
+  const somedayToggle = someday.length
+    ? `<button class="toggle" data-toggle="someday">${somedayOpen ? "Collapse ▾" : "Show all ▸"}</button>`
+    : "";
+  const somedayTile = tile("Someday/Maybe", "reflect", someday.length,
+    someday.length ? (somedayOpen ? somedayBody : somedaySummary) : `<p class="empty">Empty</p>`, somedayToggle);
 
   const autopilot = items(d.lists.autopilot).filter(inSphere);
   const autoTile = tile("Autopilot", "reflect", autopilot.length, compact(autopilot));
@@ -333,6 +341,12 @@ document.addEventListener("click", async (e) => {
     return render();
   }
   if (e.target.closest("a")) return;
+  const toggle = e.target.closest("[data-toggle]");
+  if (toggle) {
+    const key = `remgtd.${toggle.dataset.toggle}.open`;
+    localStorage.setItem(key, localStorage.getItem(key) === "1" ? "0" : "1");
+    return render();
+  }
   const step = e.target.closest("[data-step]");
   if (step) {
     const id = step.dataset.step;
