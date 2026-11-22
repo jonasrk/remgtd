@@ -1,0 +1,23 @@
+[project]
+name = "remgtd"
+version = "0.1.0"
+description = "Getting Things Done, by the book, on top of Apple Reminders: conventions plus a read-only View that checks your system."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+remgtd = "remgtd.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
