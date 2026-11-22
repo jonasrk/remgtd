@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# Personal configuration and migration notes never belong in this repo
+config.toml
+*.local.md
